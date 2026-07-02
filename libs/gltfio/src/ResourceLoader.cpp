@@ -432,7 +432,7 @@ inline bool uploadBuffers(FFilamentAsset* asset, Engine& engine,
 
             if (accessor->type == cgltf_type_vec3) {
                 slot.morphTargetBuffer->setPositionsAt(engine, slot.bufferIndex,
-                    (const float3*)floatsData, slot.morphTargetCount, slot.morphTargetOffset);
+                    (const float3*)floatsData, accessor->count, slot.morphTargetOffset);
             }
             else {
                 assert_invariant(accessor->type == cgltf_type_vec4);
@@ -625,12 +625,11 @@ inline bool uploadBuffers(FFilamentAsset* asset, Engine& engine,
             cgltf_accessor_unpack_floats(accessor, floatsData, floatsCount);
             if (accessor->type == cgltf_type_vec3) {
                 slot.morphTargetBuffer->setPositionsAt(engine, slot.bufferIndex,
-                        (const float3*) floatsData,
-                        slot.morphTargetCount,
+                        (const float3*) floatsData, safeCount,
                         slot.morphTargetOffset);
             } else {
                 slot.morphTargetBuffer->setPositionsAt(engine, slot.bufferIndex,
-                        (const float4*) data, slot.morphTargetBuffer->getVertexCount(),
+                        const float4*) floatsData, safeCount,
                         slot.morphTargetOffset);
             }
             free(floatsData);
