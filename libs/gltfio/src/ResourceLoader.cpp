@@ -432,12 +432,12 @@ inline bool uploadBuffers(FFilamentAsset* asset, Engine& engine,
 
             if (accessor->type == cgltf_type_vec3) {
                 slot.morphTargetBuffer->setPositionsAt(engine, slot.bufferIndex,
-                    (const float3*)floatsData, slot.morphTargetCount, slot.morphTargetOffset);
+                    (const float3*)floatsData, accessor->count, slot.morphTargetOffset);
             }
             else {
                 assert_invariant(accessor->type == cgltf_type_vec4);
                 slot.morphTargetBuffer->setPositionsAt(engine, slot.bufferIndex,
-                    (const float4*)floatsData, slot.morphTargetCount, slot.morphTargetOffset);
+                    (const float4*)floatsData, accessor->count, slot.morphTargetOffset);
             }
 
             free(floatsData);
@@ -626,11 +626,11 @@ inline bool uploadBuffers(FFilamentAsset* asset, Engine& engine,
             if (accessor->type == cgltf_type_vec3) {
                 slot.morphTargetBuffer->setPositionsAt(engine, slot.bufferIndex,
                         (const float3*) floatsData,
-                        slot.morphTargetCount,
+                        safeCount,
                         slot.morphTargetOffset);
             } else {
                 slot.morphTargetBuffer->setPositionsAt(engine, slot.bufferIndex,
-                        (const float4*) data, slot.morphTargetBuffer->getVertexCount(),
+                        (const float4*) floatsData, safeCount,
                         slot.morphTargetOffset);
             }
             free(floatsData);
@@ -944,6 +944,9 @@ std::pair<Texture*, CacheResult> ResourceLoader::Impl::getOrCreateTexture(FFilam
 
     // Finally, try the file system.
     else if constexpr (GLTFIO_USE_FILESYSTEM) {
+        utils::slog.w << "gltfio: Auto-loading resources from the filesystem is deprecated. "
+                      << "Please manually load bytes and use ResourceLoader::addResourceData."
+                      << utils::io::endl;
         if (auto iter = mFilepathTextureCache[cacheIdx].find(uri);
                 iter != mFilepathTextureCache[cacheIdx].end()) {
             return {iter->second, CacheResult::FOUND};
